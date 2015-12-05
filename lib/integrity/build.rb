@@ -29,9 +29,7 @@ module Integrity
     end
 
     before :destroy do
-      if commit
-        commit.destroy!
-      end
+      commit.destroy! if commit
     end
 
     def run
@@ -39,7 +37,7 @@ module Integrity
     end
 
     def run!
-      Builder.build(self, Integrity.config.directory, Integrity.logger)
+      Builder.build(self, Integrity.config.build_dir, Integrity.logger)
     end
 
     def notify
@@ -155,7 +153,7 @@ module Integrity
     end
 
     def build_directory
-      Pathname.new(Integrity.config.directory).join(self.id.to_s)
+      Pathname.new(Integrity.config.build_dir).join(self.id.to_s)
     end
     
     def escape_glob(path)

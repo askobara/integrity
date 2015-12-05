@@ -15,12 +15,12 @@ module Integrity
       end
 
       def update_notifiers(to_enable, config)
-        config.each_pair { |name, config|
+        config.each_pair do |name, config|
           notifier = notifiers.first_or_create(:name => name)
           notifier.enabled = to_enable.include?(name)
           notifier.config  = config
           notifier.save
-        }
+        end
       end
     end
   end

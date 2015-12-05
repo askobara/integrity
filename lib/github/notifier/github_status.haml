@@ -1,0 +1,4 @@
+%p.normal
+  %label{ :for => "github_status_pending" } Notify about start?
+  %input.hidden{ :name => "notifiers[GitHubStatus][notify_pending]", :type => "hidden", :value => 0 }
+  %input.checkbox{ checkbox("notifiers[GitHubStatus][notify_pending]", config["notify_pending"] == "1", :value => 1, :id => "notify_pending") }

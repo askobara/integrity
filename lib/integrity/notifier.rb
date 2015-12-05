@@ -42,5 +42,6 @@ module Integrity
     autoload :Shell, 'integrity/notifier/shell'
     autoload :TCP, 'integrity/notifier/tcp'
     autoload :Postmark, 'integrity/notifier/postmark'
+    autoload :GitHubStatus, 'github/notifier/github_status'
   end
 end

@@ -1,6 +1,6 @@
 module Integrity
   class Configuration
-    attr_reader :directory,
+    attr_reader :build_dir,
       :base_url,
       :builder
 
@@ -40,8 +40,21 @@ module Integrity
       @username && @password
     end
 
+    # root dir of the app
+    def root_dir
+      @root_dir ||= File.expand_path(File.join('..', '..', '..'), __FILE__)
+    end
+
     def log_dir
-      @log_dir ||= File.join(File.dirname(__FILE__),  '..', '..', 'log')
+      @log_dir ||= File.join(root_dir, 'log')
+    end
+
+    def bin_dir
+      @bin_dir ||= File.join(root_dir, 'bin')
+    end
+
+    def build_dir=(dir)
+      @build_dir = Pathname(dir)
     end
 
     def log_file
@@ -54,10 +67,6 @@ module Integrity
 
     def database=(uri)
       DataMapper.setup(:default, uri)
-    end
-
-    def directory=(dir)
-      @directory = Pathname(dir)
     end
 
     def base_url=(url)

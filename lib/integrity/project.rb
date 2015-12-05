@@ -14,6 +14,7 @@ module Integrity
     property :artifacts,  String,   :required => false, :length => 1000
     property :public,     Boolean,  :default  => true
     property :last_build_id, Integer, :required => false
+    property :parent_id, Integer, :required => true, :default => 0
 
     timestamps :at
 
@@ -21,13 +22,38 @@ module Integrity
 
     has n, :builds
     has n, :notifiers
+
     belongs_to :last_build, 'Build'
+
+    belongs_to :parent, 'Project'
+    has n, :children, 'Project', :child_key => [:parent_id]
 
     before :save, :set_permalink
     before :save, :fix_line_endings
 
     before :destroy do
       builds.destroy!
+    end
+
+    # Filters projects with given uri
+    #
+    # @return [DataMapper::Collection]
+    def self.filter_by_uri(uri)
+      all(:uri.like => uri + '%')
+    end
+
+    # Filters projects by uri or by his origin if it's fork
+    #
+    # @param [Repository] repository
+    # @return [DataMapper::Collection]
+    def self.filter_by_repo(repository)
+      found = filter_by_uri(repository.uri)
+
+      if repository.fork? && found.empty?
+        found = filter_by_uri(repository.origin.uri)
+      end
+
+      found
     end
 
     def get_artifacts
@@ -39,7 +65,11 @@ module Integrity
     end
 
     def repo
-      @repo ||= Repository.new(uri, branch)
+      @repo ||= Repository.new(uri, branch, origin)
+    end
+
+    def origin
+      parent.repo if parent_id != 0 && parent
     end
 
     def build_head
@@ -57,28 +87,35 @@ module Integrity
       _build
     end
 
-    def fork(new_branch)
+    # Creates new project of given repository
+    #
+    # @param [Repository] repo
+    def fork(repo)
+      Project.raise_on_save_failure = true
       forked = Project.create(
-        :name    => "#{name} (#{new_branch})",
-        :uri     => uri,
-        :branch  => new_branch,
+        :name    => "#{repo.full_name} (#{repo.branch})",
+        :uri     => repo.uri,
+        :branch  => repo.branch,
         :command => command,
+        :parent  => self,
         :public  => public?
       )
 
-      notifiers.each { |notifier|
+      # p forked.errors
+
+      notifiers.each do |notifier|
         forked.notifiers.create(
           :name    => notifier.name,
           :enabled => notifier.enabled?,
           :config  => notifier.config
         )
-      }
+      end
 
       forked
     end
 
     def github?
-      uri.to_s.include?("github.com")
+      repo.github?
     end
 
     # TODO lame, there is got to be a better way
@@ -108,7 +145,7 @@ module Integrity
         "status" => status
       }
     end
-    
+
     def to_json
       {
         "project" => attributes_for_json
@@ -126,7 +163,7 @@ module Integrity
           gsub(/-*$/, "")
         )
       end
-      
+
       def fix_line_endings
         command = self.command
         unless command.empty?
