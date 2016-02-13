@@ -37,10 +37,10 @@ end
 desc "Clean-up build directory"
 task :cleanup do
   require "init"
-  Integrity::Build.all(:completed_at.not => nil).each { |build|
-    dir = Integrity.config.directory.join(build.id.to_s)
-    dir.rmtree if dir.directory?
-  }
+  Integrity::Build.all(:completed_at.not => nil).each do |build|
+    dir = Integrity.config.build_dir.join(build.id.to_s)
+    dir.rmtree if dir.build_dir?
+  end
 end
 
 namespace :jobs do

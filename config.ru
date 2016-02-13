@@ -14,6 +14,12 @@ if Integrity.config.builder.respond_to? :web_ui
   end
 end
 
+if Integrity.config.github_enabled?
+  map '/github' do
+    run Integrity::GitHub::App
+  end
+end
+
 map '/' do
   run Integrity.app
 end

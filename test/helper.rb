@@ -23,7 +23,7 @@ class IntegrityTest < Test::Unit::TestCase
   def setup
     Integrity.configure { |c|
       c.database  = "sqlite3:db/test.db"
-      c.directory = INTEGRITY_TEST_TMP
+      c.build_dir = INTEGRITY_TEST_TMP
       c.base_url  = "http://www.example.com"
       c.log       = "test.log"
       c.username  = "admin"

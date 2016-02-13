@@ -29,27 +29,11 @@ module Integrity
       end
     end
 
-    post "/github/:token" do |token|
-      unless Integrity.config.github_enabled?
-        pass
-      end
-
-      unless token == Integrity.config.github_token
-        halt 403
-      end
-
-      Payload::GitHub.build(
-        JSON.parse(params[:payload])
-      ).to_s
-    end
-
     post '/gitlab' do
       request.body.rewind
       payload = request.body.read
 
-      Payload::GitLab.build(
-        JSON.parse(payload)
-      ).to_s
+      Payload::GitLab.build(JSON.parse(payload)).to_s
     end
 
     get "/?", :provides => 'html' do

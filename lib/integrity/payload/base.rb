@@ -1,6 +1,8 @@
 module Integrity
   module Payload
     class Base
+      attr_reader :payload
+
       def self.build(payload)
         new(payload).build
       end
@@ -14,31 +16,42 @@ module Integrity
       end
 
       def repo
-        Repository.new(uri, branch)
+        @repo ||= Repository.new(uri, branch, fork_of)
       end
 
       def head
-        commits.detect { |c| c[:identifier] == @payload["after"] }
+        raise NotImplementedError.new(
+          "Your GitHub events module should provide a #head method"
+        )
       end
 
       def commits
-        @commits ||= @payload["commits"].map { |commit|
-          { :identifier   => commit["id"],
-            :author       => normalize_author(commit["author"]),
-            :message      => commit["message"],
-            :committed_at => commit["timestamp"] }
-        }
+        raise NotImplementedError.new(
+          "Your GitHub events module should provide a #commits method"
+        )
+      end
+
+      def uri
+        raise NotImplementedError.new(
+          "Your GitHub events module should provide a #uri method"
+        )
       end
 
       def branch
-        @payload["ref"].split("refs/heads/").last
+        raise NotImplementedError.new(
+          "Your GitHub events module should provide a #branch method"
+        )
       end
 
-      def normalize_author(author)
-        "#{author["name"]} <#{author["email"]}>"
+      def fork_of
+        nil
       end
 
       def deleted?
+        false
+      end
+
+      def created?
         false
       end
     end

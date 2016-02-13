@@ -15,6 +15,8 @@ gem 'sinatra-authorization'
 gem 'bcat'
 gem 'rake'
 
+gem 'octokit', '~> 4.0'
+
 # If you want to use Thin:
 # gem 'thin'
 

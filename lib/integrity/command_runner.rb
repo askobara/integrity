@@ -1,3 +1,5 @@
+require 'shellwords'
+
 module Integrity
   class CommandRunner
     class Error < StandardError; end
@@ -31,9 +33,7 @@ module Integrity
               # should have some data to read
               begin
                 chunk = rd.read_nonblock(10240)
-                if block_given?
-                  yield chunk
-                end
+                yield chunk if block_given?
                 output += chunk
               rescue Errno::EAGAIN, Errno::EWOULDBLOCK
                 # do select again
@@ -51,17 +51,21 @@ module Integrity
           STDOUT.reopen(wr)
           wr.close
           STDERR.reopen(STDOUT)
-          if @dir
-            Dir.chdir(@dir)
-          end
-          exec(command)
+          Dir.chdir(@dir) if @dir
+
+          bash command
         end
       end
-      
+
       # output may be invalid UTF-8, as it is produced by the build command.
       output = Integrity.clean_utf8(output)
 
       Result.new($?.success?, output.chomp)
+    end
+
+    def bash(command)
+        escaped_command = Shellwords.escape(command)
+        exec "bash -c #{escaped_command}"
     end
 
     def run!(command)

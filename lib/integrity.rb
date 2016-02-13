@@ -30,6 +30,8 @@ require "addressable/uri"
 require "chronic_duration"
 require "bcat/ansi"
 
+require "core_ext/string/truncate"
+require "core_ext/string/rchomp"
 require "app/app"
 
 require "integrity/configuration"
@@ -43,13 +45,12 @@ require "integrity/builder"
 require "integrity/notifier"
 require "integrity/notifier/base"
 require "integrity/payload/base"
-require "integrity/payload/git_hub"
 require "integrity/payload/git_lab"
 require "integrity/payload_builder"
-require "integrity/checkout"
 require "integrity/command_runner"
 require "integrity/builder"
 
+require "github/github"
 
 DataMapper.finalize
 
@@ -59,13 +60,50 @@ Addressable::URI.class_eval { def gsub(*a); to_s.gsub(*a); end }
 module Integrity
   class CannotFindEncoding < StandardError
   end
-  
+
   autoload :ThreadedBuilder, "integrity/builders/threaded_builder"
   autoload :DelayedBuilder,  "integrity/builders/delayed_builder"
   autoload :ResqueBuilder,   "integrity/builders/resque_builder"
   autoload :ExplicitBuilder, "integrity/builders/explicit_builder"
 
-  Repository = Struct.new(:uri, :branch)
+  Repository = Struct.new(:uri, :branch, :fork_of) do
+    # Initialize repository's struct
+    #
+    # @param [Addressable, String] uri repo's uri which can use for clone
+    # @param [String] branch
+    # @param [Repository] fork_of the parent repo
+    # @return [Repository]
+    def initialize(uri, branch, fork_of = nil)
+      if !fork_of.nil? && fork_of.class != self.class
+        raise ArgumentError, "Argument is not a #{self.class} class"
+      end
+
+      super Addressable::URI.parse(uri), branch, fork_of
+    end
+
+    # Returns "owner/repo" pair
+    #
+    # @return [String]
+    def full_name
+      @full_name ||= uri.path.rchomp('/').chomp('.git')
+    end
+
+    # @return [Boolean]
+    def fork?
+      !fork_of.nil?
+    end
+
+    # @return [Repository, nil]
+    def origin
+      fork_of
+    end
+
+    # @return [Boolean]
+    def github?
+      uri.to_s.include?('github.com')
+    end
+
+  end
 
   def self.config
     @config ||= Configuration.new
@@ -97,12 +135,12 @@ module Integrity
       # borrowed from activesupport DateTime#to_utc
       datetime = datetime.new_offset(0)
     end
-    
+
     # This is what DateTime#to_time does some of the time.
     # Our offset is always 0 and therefore we always produce a Time
     ::Time.utc(datetime.year, datetime.month, datetime.day, datetime.hour, datetime.min, datetime.sec)
   end
-  
+
   def self.human_duration(delta)
     if delta > 0
       ChronicDuration.output(delta, :format => :micro)
@@ -110,7 +148,7 @@ module Integrity
       '0s'
     end
   end
-  
+
   # Replace or delete invalid UTF-8 characters from text, which is assumed
   # to be in UTF-8.
   #
@@ -142,7 +180,7 @@ module Integrity
     end
     text
   end
-  
+
   def self.clean_utf8_iconv
     unless @iconv_loaded
       begin
@@ -159,7 +197,7 @@ module Integrity
     end
     [@iconv, @iconv_fallback]
   end
-  
+
   # Apparently utf-16 is not available everywhere, in particular not on travis.
   # Try to find a usable encoding.
   def self.intermediate_encoding
