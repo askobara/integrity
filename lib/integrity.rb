@@ -51,6 +51,7 @@ require "integrity/command_runner"
 require "integrity/builder"
 
 require "github/github"
+require "slack/slack"
 
 DataMapper.finalize
 

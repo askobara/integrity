@@ -2,7 +2,6 @@ module Integrity
   class Notifier
     class GitHubStatus < Integrity::Notifier::Base
       attr_reader :config
-      attr_reader :client
 
       STATUS_SUCCESS = 'success'
       STATUS_FAILURE = 'failure'
@@ -14,7 +13,6 @@ module Integrity
       end
 
       def initialize(build, config={})
-        @client = Integrity::GitHub.client
         @repo_full_name = if build.repo.fork?
                             build.repo.origin.full_name
                           else
@@ -38,7 +36,7 @@ module Integrity
 
       private
       def create_status(status)
-        client.create_status(@repo_full_name, @commit_sha, status)
+        Integrity::GitHub.client.create_status(@repo_full_name, @commit_sha, status)
         puts "#{@repo_full_name} #{@commit_sha} #{status}"
       end
 

@@ -132,6 +132,7 @@ module Integrity
               e.backtrace.each do |line|
                 @logger.error(line)
               end
+              raise e
             end
             @njobs.dec
           end
