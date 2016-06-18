@@ -17,6 +17,8 @@ gem 'rake'
 
 gem 'octokit', '~> 4.0'
 
+gem 'slack-ruby-client'
+
 # If you want to use Thin:
 # gem 'thin'
 

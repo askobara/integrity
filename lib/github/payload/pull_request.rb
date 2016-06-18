@@ -17,7 +17,7 @@ module Integrity
         def commits
           @commits ||= [{
             :identifier   => payload["pull_request"]["head"]["sha"],
-            :author       => payload["pull_request"]["head"]["user"]["login"],
+            :author       => payload["pull_request"]["user"]["login"],
             :message      => payload["pull_request"]["title"],
             :committed_at => payload["pull_request"]["head"]["repo"]["pushed_at"]
           }]

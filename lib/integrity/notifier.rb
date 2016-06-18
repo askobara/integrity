@@ -43,5 +43,6 @@ module Integrity
     autoload :TCP, 'integrity/notifier/tcp'
     autoload :Postmark, 'integrity/notifier/postmark'
     autoload :GitHubStatus, 'github/notifier/github_status'
+    autoload :SlackStatus, 'slack/notifier/status'
   end
 end

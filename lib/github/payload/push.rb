@@ -14,7 +14,7 @@ module Integrity
           @commits ||= payload["commits"].map do |commit|
             {
               :identifier   => commit["id"],
-              :author       => normalize_author(commit["author"]),
+              :author       => commit["author"]["username"],
               :message      => commit["message"],
               :committed_at => commit["timestamp"]
             }
@@ -24,7 +24,7 @@ module Integrity
         def head
           @head ||= {
             :identifier   => payload["head_commit"]["id"],
-            :author       => normalize_author(payload["head_commit"]["author"]),
+            :author       => payload["head_commit"]["author"]["username"],
             :message      => payload["head_commit"]["message"],
             :committed_at => payload["head_commit"]["timestamp"]
           }
@@ -36,10 +36,6 @@ module Integrity
 
         def created?
           payload["created"]
-        end
-
-        def normalize_author(author)
-          "#{author["name"]} <#{author["email"]}>"
         end
 
       end
