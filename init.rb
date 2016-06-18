@@ -13,7 +13,7 @@ require 'integrity'
 
 Integrity.configure do |c|
   # Options are explained in local.rb.example
-  c.database                    = 'sqlite3:db/integrity.db'
+  c.database                    = "sqlite3:#{File.dirname(__FILE__)}/db/integrity.db"
   c.build_dir                   = 'builds'
   c.base_url                    = 'http://ci.example.org'
   c.build_all                   = true

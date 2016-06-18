@@ -37,7 +37,7 @@ module Integrity
     end
 
     def run!
-      Builder.build(self, Integrity.config.build_dir, Integrity.logger)
+      Builder.build(self, Integrity.logger)
     end
 
     def notify
@@ -153,7 +153,7 @@ module Integrity
     end
 
     def build_directory
-      Pathname.new(Integrity.config.build_dir).join(self.id.to_s)
+      @path ||= Pathname.new(Integrity.config.build_dir).join(repo.full_name, id.to_s)
     end
     
     def escape_glob(path)

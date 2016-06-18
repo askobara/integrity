@@ -1,12 +1,11 @@
 module Integrity
   class Builder
-    def self.build(_build, directory, logger)
-      new(_build, directory, logger).build
+    def self.build(_build, logger)
+      new(_build, logger).build
     end
 
-    def initialize(build, directory, logger)
+    def initialize(build, logger)
       @build     = build
-      @directory = directory
       @logger    = logger
 
       @build.raise_on_save_failure = true
@@ -80,7 +79,7 @@ module Integrity
     end
 
     def directory
-      @_directory ||= @directory.join(repo.full_name, @build.id.to_s)
+      @build.build_directory
     end
 
     def repo

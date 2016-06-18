@@ -2,7 +2,6 @@ require 'slack-ruby-client'
 
 Slack.configure do |config|
   config.token = ENV['SLACK_API_TOKEN']
-  fail 'Missing ENV[SLACK_API_TOKEN]!' unless config.token
 end
 
 # client = Slack::Web::Client.new
@@ -19,6 +18,7 @@ module Integrity
     #
     # @return [Octokit::Client]
     def self.client
+      fail 'Missing ENV[SLACK_API_TOKEN]!' unless ENV['SLACK_API_TOKEN']
       @client ||= ::Slack::Web::Client.new
     end
 

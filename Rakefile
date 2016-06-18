@@ -1,4 +1,4 @@
-$LOAD_PATH.unshift(File.expand_path(File.dirname(".")))
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__))
 require "rake/testtask"
 require "rake/clean"
 require 'fileutils'
@@ -38,8 +38,8 @@ desc "Clean-up build directory"
 task :cleanup do
   require "init"
   Integrity::Build.all(:completed_at.not => nil).each do |build|
-    dir = Integrity.config.build_dir.join(build.id.to_s)
-    dir.rmtree if dir.build_dir?
+    dir = build.build_directory
+    dir.rmtree if dir.exist?
   end
 end
 
