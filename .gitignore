@@ -6,5 +6,8 @@ builds
 .rvmrc
 *.tmproj
 /tmp
+/log
 /local.rb
 credentials.yaml
+.env
+/vendor

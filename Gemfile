@@ -11,19 +11,19 @@ gem 'sass'
 gem 'chronic_duration'
 gem 'sinatra'
 gem 'sinatra-authorization'
+gem 'dotenv'
 
 gem 'bcat'
 gem 'rake'
 
 gem 'octokit', '~> 4.0'
-
 gem 'slack-ruby-client'
 
 # If you want to use Thin:
 # gem 'thin'
 
 # If you want to use Unicorn:
-# gem 'unicorn'
+gem 'unicorn'
 
 # These are dependencies for the various notifiers. Uncomment as appropriate.
 # = Email
@@ -95,4 +95,9 @@ group :test do
   gem 'webmock'
   gem 'turn'
   gem 'timecop'
+end
+
+group :development do
+  gem 'capistrano'
+  gem 'capistrano-bundler'
 end
