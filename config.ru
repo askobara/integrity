@@ -1,8 +1,12 @@
-require File.expand_path("../init", __FILE__)
-
 require 'dotenv'
-
 Dotenv.load
+
+begin
+  require 'awesome_print'
+rescue LoadError
+end
+
+require File.expand_path("../init", __FILE__)
 
 if (ENV['ADMIN_USERNAME'] || ENV['ADMIN_USER']) && ENV['ADMIN_PASSWORD']
   use Rack::Auth::Basic do |username, password|

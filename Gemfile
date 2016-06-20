@@ -98,6 +98,9 @@ group :test do
 end
 
 group :development do
+  gem 'pry'
+  gem 'pry-byebug'
   gem 'capistrano'
   gem 'capistrano-bundler'
+  gem 'awesome_print'
 end

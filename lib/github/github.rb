@@ -3,6 +3,8 @@ require 'octokit'
 require 'github/payload/push'
 require 'github/payload/pull_request'
 
+fail 'Missing ENV[GITHUB_ACCESS_TOKEN]!' unless ENV['GITHUB_ACCESS_TOKEN']
+
 module Integrity
   module GitHub
     ACCESS_TOKEN = ENV['GITHUB_ACCESS_TOKEN']
@@ -15,6 +17,10 @@ module Integrity
     end
 
     class App < Sinatra::Base
+      configure do
+        enable :logging, :dump_errors, :raise_errors
+      end
+
       # Handle GitHub's events
       #
       # @return [Integer] Number of started builds

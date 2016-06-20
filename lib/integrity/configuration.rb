@@ -62,7 +62,7 @@ module Integrity
     end
 
     def logger
-      @logger ||= Logger.new(log_file)
+      @logger ||= Logger.new(STDOUT)
     end
 
     def database=(uri)

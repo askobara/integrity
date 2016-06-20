@@ -19,6 +19,7 @@ module Integrity
                             build.repo.full_name
                           end
         @commit_sha = build.commit.identifier
+
         super
       end
 
@@ -37,7 +38,7 @@ module Integrity
       private
       def create_status(status)
         Integrity::GitHub.client.create_status(@repo_full_name, @commit_sha, status)
-        puts "#{@repo_full_name} #{@commit_sha} #{status}"
+        Integrity.config.logger.info "#{@repo_full_name} #{@commit_sha} #{status}"
       end
 
     end
